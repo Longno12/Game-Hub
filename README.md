@@ -1,2 +1,8 @@
-# Game-Hub
-A desktop application for managing and launching games with custom categories and search functionality.
+# 🎮 Enhanced Game Hub
+
+A desktop application built with **WPF (.NET)** for managing and launching your game library.
+
+## 📦 Features
+- 🕹️ Add and launch games directly.
+- 🔍 Search and filter games by category.
+- 🖼️ Automatically extract game icons.
