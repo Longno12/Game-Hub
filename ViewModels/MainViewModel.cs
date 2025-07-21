@@ -205,7 +205,7 @@ namespace EnhancedGameHub.ViewModels
             FilterGames();
             await SaveGamesAsync();
 
-            IsAddGameFlyoutOpen = false; // Close the flyout
+            IsAddGameFlyoutOpen = false; 
         }
         #endregion
 
@@ -251,18 +251,14 @@ namespace EnhancedGameHub.ViewModels
         private async Task<string> ExtractExeIconAsync(string exePath)
         {
             if (string.IsNullOrEmpty(exePath) || !File.Exists(exePath)) return null;
-
-            // Run the extraction on a background thread.
             return await Task.Run(() =>
             {
                 try
                 {
-                    // Use our new helper to get the highest quality icon as a BitmapSource.
                     BitmapSource bestIcon = IconHelper.GetHighestResolutionIcon(exePath);
 
                     if (bestIcon == null)
                     {
-                        // Fallback to the old method if the new one fails.
                         using (Icon icon = Icon.ExtractAssociatedIcon(exePath))
                         {
                             if (icon == null) return null;
@@ -279,23 +275,16 @@ namespace EnhancedGameHub.ViewModels
 
                     if (bestIcon != null)
                     {
-                        // Ensure the Icons directory exists.
                         string iconDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Icons");
                         Directory.CreateDirectory(iconDirectory);
-
-                        // Use a GUID for the filename to prevent conflicts.
                         string iconPath = Path.Combine(iconDirectory, $"{Guid.NewGuid()}.png");
-
-                        // Encode the high-quality BitmapSource to a PNG file.
                         var encoder = new PngBitmapEncoder();
                         encoder.Frames.Add(BitmapFrame.Create(bestIcon));
-
                         using (var stream = new FileStream(iconPath, FileMode.Create))
                         {
                             encoder.Save(stream);
                         }
-
-                        return iconPath; // Return the path to our high-quality saved icon.
+                        return iconPath;
                     }
                 }
                 catch (Exception ex)
@@ -303,7 +292,7 @@ namespace EnhancedGameHub.ViewModels
                     Debug.WriteLine($"High-quality icon extraction failed: {ex.Message}");
                 }
 
-                return null; // Return null if everything fails.
+                return null;
             });
         }
 
