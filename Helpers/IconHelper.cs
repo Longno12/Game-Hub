@@ -18,7 +18,7 @@ namespace EnhancedGameHub.Helpers
 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern bool DestroyIcon(IntPtr hIcon);
-
+        
         [StructLayout(LayoutKind.Sequential)]
         private struct ICONINFO
         {
@@ -33,37 +33,25 @@ namespace EnhancedGameHub.Helpers
         private static extern bool GetIconInfo(IntPtr hIcon, out ICONINFO piconinfo);
         #endregion
 
-        /// <summary>
-        /// Extracts the highest resolution icon from an executable file.
-        /// </summary>
-        /// <param name="exePath">The path to the executable file.</param>
-        /// <returns>A high-resolution BitmapSource of the icon, or null if an icon could not be extracted.</returns>
         public static BitmapSource GetHighestResolutionIcon(string exePath)
         {
-            if (string.IsNullOrEmpty(exePath) || !File.Exists(exePath))
-                return null;
+            if (string.IsNullOrEmpty(exePath) || !File.Exists(exePath)) return null;
 
             IntPtr[] iconHandles = null;
             try
             {
-                // First, get the total number of icons in the file.
                 uint iconCount = PrivateExtractIcons(exePath, 0, 0, 0, null, null, 0, 0);
-                if (iconCount == 0 || iconCount == 0xFFFFFFFF)
-                    return null;
+                if (iconCount == 0 || iconCount == 0xFFFFFFFF) return null;
 
-                // Create arrays to hold the handles and IDs.
                 iconHandles = new IntPtr[iconCount];
                 uint[] iconIds = new uint[iconCount];
 
-                // Extract all icons into our array.
                 uint extractedCount = PrivateExtractIcons(exePath, 0, 256, 256, iconHandles, iconIds, iconCount, 0);
-                if (extractedCount == 0)
-                    return null;
+                if (extractedCount == 0) return null;
 
                 int bestIconIndex = -1;
                 int maxIconSize = 0;
 
-                // Find the index of the largest icon.
                 for (int i = 0; i < extractedCount; i++)
                 {
                     if (GetIconInfo(iconHandles[i], out ICONINFO info))
@@ -78,26 +66,18 @@ namespace EnhancedGameHub.Helpers
                         }
                     }
                 }
-
                 if (bestIconIndex != -1)
                 {
-                    // Convert the best icon handle to a BitmapSource for WPF.
-                    return Imaging.CreateBitmapSourceFromHIcon(
-                        iconHandles[bestIconIndex],
-                        Int32Rect.Empty,
-                        BitmapSizeOptions.FromEmptyOptions());
+                    return Imaging.CreateBitmapSourceFromHIcon( iconHandles[bestIconIndex], Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
                 }
-
                 return null;
             }
             catch (Exception)
             {
-                // Something went wrong during extraction.
                 return null;
             }
             finally
             {
-                // IMPORTANT: Clean up all the extracted icon handles.
                 if (iconHandles != null)
                 {
                     foreach (var handle in iconHandles)
